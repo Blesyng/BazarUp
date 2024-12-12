@@ -1,0 +1,2 @@
+# BazarUp
+detalhar
