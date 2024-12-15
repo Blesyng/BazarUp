@@ -10,7 +10,7 @@ services:
       MYSQL_USER: andersonUser
       MYSQL_PASSWORD: Anderson8232
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - ./database:/docker-entrypoint-initdb.d
 
@@ -34,9 +34,11 @@ services:
   frontend:
     build:
       context: ./frontend
+
     container_name: brecho_frontend
     restart: always
     ports:
       - "3000:3000"
     volumes:
       - ./frontend:/app
+
