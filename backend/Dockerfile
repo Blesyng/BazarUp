@@ -1,7 +1,8 @@
 FROM node:18
-WORKDIR /app
+WORKDIR /
 COPY package.json ./
 RUN npm install
 COPY . .
-CMD ["node", "src/index.js"]
+CMD ["node", "src/server.js"]
 EXPOSE 3001
+

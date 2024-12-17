@@ -10,35 +10,25 @@ services:
       MYSQL_USER: andersonUser
       MYSQL_PASSWORD: Anderson8232
     ports:
-      - "3307:3306"
+      - "3306:3306"
     volumes:
       - ./database:/docker-entrypoint-initdb.d
 
   backend:
     build:
-      context: ./backend
+      context: ./backend  # Caminho para o diretório do backend
     container_name: brecho_backend
     restart: always
     ports:
       - "3001:3001"
     volumes:
-      - ./backend:/app
+      - ./backend:/app  # Mapeamento do código do backend
     depends_on:
       - db
     environment:
+      DB_PORT: 3306
       DB_HOST: db
       DB_USER: andersonUser
       DB_PASSWORD: Anderson8232
       DB_NAME: brecho
-
-  frontend:
-    build:
-      context: ./frontend
-
-    container_name: brecho_frontend
-    restart: always
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./frontend:/app
-
+    command: npm run start  # Comando para rodar o backend
