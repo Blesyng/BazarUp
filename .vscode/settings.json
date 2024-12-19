@@ -1,19 +1,19 @@
 {
-    "sqltools.connections": [
-        {
-            "mysqlOptions": {
-                "authProtocol": "default",
-                "enableSsl": "Disabled"
-            },
-            "previewLimit": 50,
-            "server": "localhost",
-            "port": 3307,
-            "driver": "MySQL",
-            "name": "brecho_db",
-            "group": "brecho",
-            "database": "brecho",
-            "username": "andersonUser",
-            "password": "Anderson8232"
-        }
-    ]
+  "sqltools.connections": [
+    {
+      "mysqlOptions": {
+        "authProtocol": "default",
+        "enableSsl": "Disabled"
+      },
+      "previewLimit": 50,
+      "server": "localhost",
+      "port": 3307,
+      "driver": "MySQL",
+      "name": "brecho_db",
+      "group": "brecho",
+      "database": "brecho",
+      "username": "andersonUser",
+      "password": "Anderson8232"
+    }
+  ]
 }

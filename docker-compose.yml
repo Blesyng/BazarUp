@@ -1,34 +1,41 @@
-version: "3.8"
+version: "3.9" # Especifique a versão do Docker Compose
 services:
-  db:
+  mysqldb:
     image: mysql:8.0.40
     container_name: brecho_db
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: 8232
-      MYSQL_DATABASE: brecho
-      MYSQL_USER: andersonUser
-      MYSQL_PASSWORD: Anderson8232
-    ports:
-      - "3306:3306"
+    restart: unless-stopped
     volumes:
       - ./database:/docker-entrypoint-initdb.d
-
-  backend:
-    build:
-      context: ./backend  # Caminho para o diretório do backend
-    container_name: brecho_backend
-    restart: always
-    ports:
-      - "3001:3001"
-    volumes:
-      - ./backend:/app  # Mapeamento do código do backend
-    depends_on:
-      - db
+    env_file: ./.env
     environment:
-      DB_PORT: 3306
-      DB_HOST: db
-      DB_USER: andersonUser
-      DB_PASSWORD: Anderson8232
-      DB_NAME: brecho
-    command: npm run start  # Comando para rodar o backend
+      - MYSQL_ROOT_PASSWORD=$MYSQL_PASSWORD
+      - MYSQL_DATABASE=$MYSQL_DATABASE
+      - MYSQL_TCP_PORT=$MYSQL_DOCKER_PORT # Not necessary, MySQL uses 3306 by default. Remove this.
+    ports:
+      - $MYSQL_LOCAL_PORT:$MYSQL_DOCKER_PORT
+    expose:
+      - $MYSQL_DOCKER_PORT # Make sure this matches the internal port used (3306 by default) if different. Remove otherwise.
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 5
+
+  app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    working_dir: /usr/src/bazarUp
+    container_name: Bazar-Api
+    restart: unless-stopped
+    env_file: ./.env
+    environment:
+      - MYSQL_HOST=mysqldb
+      - MYSQL_PORT=$MYSQL_DOCKER_PORT # Use MYSQL_PORT here for consistency, and since the backend needs the *internal* container port. If not specified explicitly as MYSQL_TCP_PORT in the db service it will be 3306.
+      - MYSQL_DATABASE=$MYSQL_DATABASE
+      - MYSQL_USERNAME=$MYSQL_USERNAME # MYSQL_USERNAME is better than MYSQL_USER, to maintain consistency with naming conventions.
+      - MYSQL_PASSWORD=$MYSQL_PASSWORD
+    ports:
+      - $NODE_LOCAL_PORT:$NODE_DOCKER_PORT
+
+    stdin_open: true
+    tty: true

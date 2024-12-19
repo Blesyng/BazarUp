@@ -7,7 +7,11 @@ exports.getAllProducts = async (req, res) => {
 
 exports.createProduct = async (req, res) => {
   const { name, price, description } = req.body;
-  const product = await Product.create({ name, price, description, updatedBy: req.user.id });
+  const product = await Product.create({
+    name,
+    price,
+    description,
+    updatedBy: req.user.id,
+  });
   res.json(product);
 };
-

@@ -6,14 +6,18 @@ const productRoutes = require("./routes/productRoutes");
 const app = express();
 app.use(express.json());
 
-app.use("/routes/users", userRoutes);
-app.use("/routes/products", productRoutes);
-
 // Sincronizando o banco de dados com o Sequelize
-sequelize.sync().then(() => {
-  console.log("Database synced!");
-}).catch((err) => {
-  console.error("Error syncing database:", err);
-});
+sequelize
+  .sync()
+  .then(() => {
+    console.log("Database synced!");
+  })
+  .catch((err) => {
+    console.error("Error syncing database:", err);
+  });
 
-module.exports = app;  // Correção aqui
+// Rotas
+app.use("api/users", userRoutes);
+app.use("api/products", productRoutes);
+
+module.exports = app; // Correção aqui
