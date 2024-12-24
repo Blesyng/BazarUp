@@ -1,4 +1,7 @@
-
+-- Criar o usuário com senha
+CREATE USER '${MYSQL_USER}'@'%' IDENTIFIED WITH caching_sha2_password BY '${MYSQL_PASSWORD}';
+GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'%';
+FLUSH PRIVILEGES;
 
 -- Tabela de Usuários (Vendedores)
 CREATE TABLE usuarios (

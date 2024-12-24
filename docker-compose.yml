@@ -5,10 +5,13 @@ services:
     container_name: brecho_db
     restart: unless-stopped
     volumes:
-      - ./database:/docker-entrypoint-initdb.d
+      - ./backend/src/config:/docker-entrypoint-initdb.d
+ 
     env_file: ./.env
     environment:
-      - MYSQL_ROOT_PASSWORD=$MYSQL_PASSWORD
+      - MYSQL_USER=$MYSQL_USER
+      - MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
+      - MYSQL_PASSWORD=$MYSQL_PASSWORD
       - MYSQL_DATABASE=$MYSQL_DATABASE
       - MYSQL_TCP_PORT=$MYSQL_DOCKER_PORT # Not necessary, MySQL uses 3306 by default. Remove this.
     ports:
@@ -21,7 +24,7 @@ services:
       retries: 5
 
   app:
-    build:
+    build: 
       context: ./backend
       dockerfile: Dockerfile
     working_dir: /usr/src/bazarUp
@@ -30,12 +33,16 @@ services:
     env_file: ./.env
     environment:
       - MYSQL_HOST=mysqldb
-      - MYSQL_PORT=$MYSQL_DOCKER_PORT # Use MYSQL_PORT here for consistency, and since the backend needs the *internal* container port. If not specified explicitly as MYSQL_TCP_PORT in the db service it will be 3306.
+      - MYSQL_PORT=$MYSQL_DOCKER_PORT
       - MYSQL_DATABASE=$MYSQL_DATABASE
-      - MYSQL_USERNAME=$MYSQL_USERNAME # MYSQL_USERNAME is better than MYSQL_USER, to maintain consistency with naming conventions.
+      - MYSQL_USER=$MYSQL_USER
       - MYSQL_PASSWORD=$MYSQL_PASSWORD
+      - MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
     ports:
       - $NODE_LOCAL_PORT:$NODE_DOCKER_PORT
-
+    depends_on:
+      - mysqldb
     stdin_open: true
     tty: true
+
+
