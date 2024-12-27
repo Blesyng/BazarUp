@@ -1,7 +1,10 @@
--- Criar o usuário com senha
-CREATE USER '${MYSQL_USER}'@'%' IDENTIFIED WITH caching_sha2_password BY '${MYSQL_PASSWORD}';
-GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'%';
+-- Criar o usuário com senha (se aplicável ao seu ambiente)
+CREATE USER IF NOT EXISTS '@MYSQL_USER'@'%' IDENTIFIED WITH caching_sha2_password BY '@MYSQL_PASSWORD';
+GRANT ALL PRIVILEGES ON `@MYSQL_DATABASE`.* TO '@MYSQL_USER'@'%';
 FLUSH PRIVILEGES;
+
+-- Rest of your SQL...
+
 
 -- Tabela de Usuários (Vendedores)
 CREATE TABLE usuarios (
@@ -30,10 +33,10 @@ CREATE TABLE produtos (
     descricao TEXT,
     preco DECIMAL(10, 2) NOT NULL,
     quantidade INT NOT NULL DEFAULT 1,
-    foto LONGBLOB, -- Suporte para armazenar a imagem do produto
-    qrcode VARCHAR(255) NOT NULL UNIQUE, -- QR Code único gerado para o produto
-    cliente_id INT, -- Referência ao cliente que consignou a roupa
-    usuario_id INT NOT NULL, -- Referência ao vendedor que cadastrou o produto
+    foto LONGBLOB,
+    qrcode VARCHAR(255) NOT NULL UNIQUE,
+    cliente_id INT,
+    usuario_id INT NOT NULL,
     data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE SET NULL,
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
@@ -42,26 +45,37 @@ CREATE TABLE produtos (
 -- Tabela de Vendas
 CREATE TABLE vendas (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    produto_id INT NOT NULL, -- Referência ao produto vendido
-    cliente_id INT, -- Referência ao cliente consignador (se aplicável)
-    usuario_id INT NOT NULL, -- Referência ao vendedor que realizou a venda
+    produto_id INT NOT NULL,
+    cliente_id INT,
+    usuario_id INT NOT NULL,
     quantidade INT NOT NULL DEFAULT 1,
-    valor_total DECIMAL(10, 2) NOT NULL, -- Valor total da venda
+    valor_total DECIMAL(10, 2) NOT NULL,
     data_venda TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (produto_id) REFERENCES produtos(id) ON DELETE CASCADE,
     FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE SET NULL,
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
 );
 
--- Tabela de Relatórios de Consignação
+-- Tabela de Consignações (Corrigida)
 CREATE TABLE consignacoes (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    cliente_id INT NOT NULL, -- Referência ao cliente consignador
-    produto_id INT NOT NULL, -- Referência ao produto consignado
-    valor_venda DECIMAL(10, 2) NOT NULL, -- Valor da venda
-    valor_brecho DECIMAL(10, 2) NOT NULL, -- Valor que fica com o brechó
-    valor_cliente DECIMAL(10, 2) NOT NULL, -- Valor que vai para o cliente consignador
-    data_venda TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    cliente_id INT NOT NULL,
+    produto_id INT NOT NULL,
+    valor_venda DECIMAL(10, 2) NOT NULL,
+    data_consignacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Nova coluna para data de consignação
+    data_venda TIMESTAMP NULL, --  Permitir nulo, pois a venda pode não ter ocorrido ainda
     FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE CASCADE,
     FOREIGN KEY (produto_id) REFERENCES produtos(id) ON DELETE CASCADE
 );
+
+-- Tabela de Configurações (para armazenar a comissão do brechó)
+CREATE TABLE configuracoes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    chave VARCHAR(255) UNIQUE,
+    valor VARCHAR(255)
+);
+
+-- Inserir a comissão do brechó (ajuste conforme necessário)
+INSERT INTO configuracoes (chave, valor) VALUES ('comissao_brecho', '0.60');
+
+

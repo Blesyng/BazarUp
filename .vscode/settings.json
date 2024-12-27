@@ -14,6 +14,20 @@
       "database": "brecho",
       "username": "andersonUser",
       "password": "Anderson8232"
+    },
+    {
+      "mysqlOptions": {
+        "authProtocol": "default",
+        "enableSsl": "Disabled"
+      },
+      "previewLimit": 50,
+      "server": "localhost",
+      "port": 3307,
+      "driver": "MySQL",
+      "name": "brecho",
+      "database": "brecho",
+      "username": "anderson8232",
+      "askForPassword": true
     }
   ]
 }
